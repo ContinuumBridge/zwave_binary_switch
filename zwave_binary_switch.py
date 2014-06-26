@@ -21,16 +21,9 @@ class Adaptor(CbAdaptor):
         logging.basicConfig(filename=CB_LOGFILE,level=CB_LOGGING_LEVEL,format='%(asctime)s %(message)s')
         self.status = "ok"
         self.state = "stopped"
-        initMsg = {"id": self.id,
-                   "type": "app",
-                   "status": "req-config"} 
-        self.managerFactory = CbClientFactory(self.processManager, initMsg)
-        reactor.connectUNIX(managerSocket, self.managerFactory, timeout=10)
-
-        reactor.callLater(TIME_TO_MONITOR_STATUS, self.sendStatus)
         # super's __init__ must be called:
-        super(Adaptor, self).__init__(argv)
-        #CbAdaptor.__init__(self, argv)
+        #super(Adaptor, self).__init__(argv)
+        CbAdaptor.__init__(self, argv)
  
     def setState(self, action):
         if self.state == "stopped":
@@ -90,13 +83,14 @@ class Adaptor(CbAdaptor):
             return "0"
 
     def switch(self, onOrOff):
-        cmd = ("id": self.id,
-               "address": self.address,
+        cmd = {"id": self.id,
+               "request": "post",
+               "address": self.addr,
                "instance": "0",
-               "commandClass": "50",
+               "commandClass": "0x25",
                "value": self.onOff(onOrOff)
               }
-        self.sendZwaveMessage(cmd):
+        self.sendZwaveMessage(cmd)
 
     def onAppInit(self, message):
         logging.debug("%s %s %s onAppInit, req = %s", ModuleName, self.id, self.friendly_name, message)
@@ -108,12 +102,13 @@ class Adaptor(CbAdaptor):
                                "purpose": "heater"}],
                 "content": "functions"}
         self.sendMessage(resp, message["id"])
+        self.setState("running")
 
     def onAppCommand(self, message):
-        # If at first it doesn't succeed, try again.
-        if not message["data"]:
+        logging.debug("%s %s %s onAppCommand, req = %s", ModuleName, self.id, self.friendly_name, message)
+        if "data" not in message:
             logging.warning("%s %s %s app message without data: %s", ModuleName, self.id, self.friendly_name, message)
-        elif message["data"] != "on" or message["data"] != off:
+        elif message["data"] != "on" and message["data"] != "off":
             logging.warning("%s %s %s app switch state must be on or off: %s", ModuleName, self.id, self.friendly_name, message)
         else:
             self.switch(message["data"])
@@ -123,6 +118,7 @@ class Adaptor(CbAdaptor):
             May be called again if there is a new configuration, which
             could be because a new app has been added.
         """
+        logging.debug("%s onConfigureMessage, config: %s", ModuleName, config)
         self.setState("starting")
 
 if __name__ == '__main__':
