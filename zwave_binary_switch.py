@@ -88,12 +88,13 @@ class Adaptor(CbAdaptor):
                "address": self.addr,
                "instance": "0",
                "commandClass": "0x25",
+               "action": "Set",
                "value": self.onOff(onOrOff)
               }
         self.sendZwaveMessage(cmd)
 
     def onAppInit(self, message):
-        logging.debug("%s %s %s onAppInit, req = %s", ModuleName, self.id, self.friendly_name, message)
+        #logging.debug("%s %s %s onAppInit, req = %s", ModuleName, self.id, self.friendly_name, message)
         resp = {"name": self.name,
                 "id": self.id,
                 "status": "ok",
@@ -105,7 +106,7 @@ class Adaptor(CbAdaptor):
         self.setState("running")
 
     def onAppCommand(self, message):
-        logging.debug("%s %s %s onAppCommand, req = %s", ModuleName, self.id, self.friendly_name, message)
+        #logging.debug("%s %s %s onAppCommand, req = %s", ModuleName, self.id, self.friendly_name, message)
         if "data" not in message:
             logging.warning("%s %s %s app message without data: %s", ModuleName, self.id, self.friendly_name, message)
         elif message["data"] != "on" and message["data"] != "off":
