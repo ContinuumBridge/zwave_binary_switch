@@ -55,12 +55,13 @@ class Adaptor(CbAdaptor):
         for a in self.apps:
             self.sendMessage(msg, a)
 
-    def sendParameter(self, parameter, data, timeStamp):
+    def sendCharacteristic(self, characteristic, data, timeStamp):
         msg = {"id": self.id,
-               "content": parameter,
+               "content": "characteristic",
+               "characteristic": characteristic,
                "data": data,
                "timeStamp": timeStamp}
-        for a in self.apps[parameter]:
+        for a in self.apps[characteristic]:
             reactor.callFromThread(self.sendMessage, msg, a)
 
     def onStop(self):
@@ -98,10 +99,8 @@ class Adaptor(CbAdaptor):
         resp = {"name": self.name,
                 "id": self.id,
                 "status": "ok",
-                "functions": [{"parameter": "switch",
-                               "type": "240V",
-                               "purpose": "heater"}],
-                "content": "functions"}
+                "service": [{"characteristic": "switch"}],
+                "content": "service"}
         self.sendMessage(resp, message["id"])
         self.setState("running")
 
