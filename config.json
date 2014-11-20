@@ -1,0 +1,11 @@
+{
+    "exe": "zwave_binary_switch.py", 
+    "protocol": "zwave", 
+    "name": "Binary Power Switch", 
+    "device_resource": "/api/bridge/v1/device/3/", 
+    "url": "https://github.com/ContinuumBridge/zwave_binary_switch/archive/v0.2.0.tar.gz", 
+    "version": "0.2.0", 
+    "provider": "ContinuumBridge", 
+    "adaptor_resource": "/api/bridge/v1/adaptor/3/", 
+    "description": "Adaptor for Z-wave Binary Switch"
+}
